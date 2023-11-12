@@ -1,8 +1,11 @@
 const fs = require("fs/promises");
-// const { nanoid } = require("nanoid");
+const { nanoid } = require("nanoid");
 const path = require("path");
 // const DetectFileEncoding = require("detect-file-encoding-and-language");
 const contactsPath = path.join(__dirname, "db", "contacts.json");
+
+const updateContacts = (contacts) =>
+  fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
 
 // Возвращает массив контактов
 const listContacts = async () => {
@@ -29,15 +32,15 @@ const getContactById = async (contactId) => {
 // Возвращает объект удаленного контакта. Возвращает null, если объект с таким id не найден.
 const removeContact = async (contactId) => {
   try {
-    const data = await listContacts();
-    const index = data.findIndex((contact) => contact.id === contactId);
+    const contacts = await listContacts();
+    const index = contacts.findIndex((contact) => contact.id === contactId);
     if (index === -1) {
       return null;
     }
 
-    const deletedContact = data.splice(index, 1);
+    const deletedContact = contacts.splice(index, 1);
 
-    await fs.writeFile(contactsPath, JSON.stringify(data, null, 2));
+    await updateContacts(contacts);
     return deletedContact;
   } catch (error) {
     console.error(error);
@@ -45,15 +48,15 @@ const removeContact = async (contactId) => {
 };
 
 // Возвращает объект добавленного контакта.
-const addContact = async ({ id, name, email, phone }) => {
+const addContact = async ({ name, email, phone }) => {
   try {
-    const data = await listContacts();
+    const contacts = await listContacts();
 
-    const newContact = { id, name, email, phone };
+    const newContact = { id: nanoid(), name, email, phone };
 
-    const newData = [...data, newContact];
+    contacts.push(newContact);
 
-    await fs.writeFile(contactsPath, JSON.stringify(newData, null, 2));
+    await updateContacts(contacts);
 
     return newContact;
   } catch (error) {
@@ -61,6 +64,32 @@ const addContact = async ({ id, name, email, phone }) => {
   }
 };
 
-module.exports = { listContacts, getContactById, removeContact, addContact };
+// Возвращает обьект обновлённого контакта
+const updateContact = async (id, data) => {
+  try {
+    const contacts = await listContacts();
+    const index = contacts.findIndex((contact) => contact.id === id);
+
+    if (index === -1) {
+      return null;
+    }
+
+    contacts[index] = { id, ...data };
+
+    await updateContacts(contacts);
+
+    return contacts[index];
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+module.exports = {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+  updateContact,
+};
 
 // listContacts();

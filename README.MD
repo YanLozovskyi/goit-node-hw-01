@@ -21,3 +21,9 @@ node index.js --action add --id 1235 --name Mango1 --email mang1o@gmail.com --ph
 node index.js --action remove --id 1235
 
 ![removecntct](/images/remove.png)
+
+# Обновляем контакт и выводим в консоль обновлённый контакт или null, если контакта с таким id не существует.
+
+node index.js --action remove --id 1235
+
+![removecntct](/images/remove.png)
