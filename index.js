@@ -1,32 +1,36 @@
-const {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-} = require("./contacts");
+const operations = require("./contacts");
+const { program } = require("commander");
 
-const argv = require("yargs").argv;
+program
+  .option("-a, --action <type>", "choose action")
+  .option("-i, --id <type>", "user id")
+  .option("-n, --name <type>", "user name")
+  .option("-e, --email <type>", "user email")
+  .option("-p, --phone <type>", "user phone");
+
+program.parse(process.argv);
+
+const argv = program.opts();
 
 async function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
     case "list":
-      console.table(await listContacts());
+      console.table(await operations.listContacts());
       break;
 
     case "get":
-      console.log(await getContactById(id));
+      console.log(await operations.getContactById(id));
       break;
 
     case "add":
-      console.log(await addContact({ name, email, phone }));
+      console.log(await operations.addContact({ name, email, phone }));
       break;
 
     case "remove":
-      console.log(await removeContact(id));
+      console.log(await operations.removeContact(id));
       break;
     case "update":
-      console.log(await updateContact(id, { name, email, phone }));
+      console.log(await operations.updateContact(id, { name, email, phone }));
       break;
     default:
       console.warn("\x1B[31m Unknown action type!");
